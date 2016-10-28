@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+usage="$(basename $0) <seconds> <dir> <inputs>"
+
+if [[ -z "$1" ]]; then
+  echo $usage
+  exit 1
+fi
+
+longest_str=0
+talk() {
+  if [[ ${#1} -gt $longest_str ]]; then
+    longest_str=${#1}
+  fi
+  printf "\r%-"$longest_str"s" "$1"
+  if [[ "$2" = "-" ]]; then
+    printf "%-"$longest_str"s\n" ""
+    longest_str=0
+  fi
+}
+
+segment_length=$1
+shift
+output_dir=$1
+shift
+
+if [[ ! -d "$output_dir" ]]; then
+  echo 'Output dir not found'
+  exit 3
+fi
+
+which -s ffmpeg
+if [ $? -ne 0 ]; then
+  echo 'Please install ffmpeg'
+  exit 2
+fi
+which -s ffprobe
+if [ $? -ne 0 ]; then
+  echo 'Please install ffprobe'
+  exit 2
+fi
+
+current_file=0
+total_files=$#
+
+talk "Starting segmentation..." -
+
+for filepath in "$@"
+do
+  current_file=$(( $current_file + 1 ))
+
+  filename=$(basename "$filepath")
+  ext=${filename##*.}
+  name=${filename%.*}
+
+  # Get start-time
+  starttime=$(ffprobe -v quiet -show_format -i $filepath | grep "start_time" | cut -d= -f2)
+  duration=$(ffprobe -v quiet -show_format -i $filepath | grep "duration" | cut -d= -f2 | cut -d. -f1)
+
+  # Cut into segments
+  current_segment=0
+  total_segments=$(expr $duration / $segment_length)
+  segment_start=0
+  segment_end=0
+
+  while true; do
+    segment_end=$(( $segment_start + $segment_length ))
+    current_segment=$(( $current_segment + 1 ))
+    talk "($current_file/$total_files) Processing: $filename ($current_segment of $total_segments)"
+    if [[ $segment_end -ge $duration ]]; then
+      break;
+    fi
+    ffmpeg -n -loglevel error -ss "$segment_start.0" -t $segment_length -i $filepath "$output_dir/${name}_${current_segment}.mp4"
+		segment_start="$segment_end"
+    sleep 0.1
+	done
+
+  error=$?
+  if [[ $error != 0 ]]; then
+    talk "Error $error: $filepath"
+  else
+    talk "Processed: $filename" -
+  fi
+
+done
+talk "Done segmenting $total_files files." -

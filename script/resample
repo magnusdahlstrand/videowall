@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# Usage: resample <width> <aspectratio> <dir> <inputs>
+
+longest_str=0
+talk() {
+  if [[ ${#1} -gt $longest_str ]]; then
+    longest_str=${#1}
+  fi
+  printf "\r%-"$longest_str"s" "$1"
+}
+
+width=$1
+shift
+aspect=$1
+shift
+if [[ ! $aspect = *:* ]]; then
+	echo 'please give aspect ratio with colon between numbers'
+	exit 4
+fi
+aspect_w=$(cut -d: -f1 <<< "$aspect")
+aspect_h=$(cut -d: -f2 <<< "$aspect")
+
+output_dir=$1
+shift
+
+if [[ ! -d "$output_dir" ]]; then
+  echo 'Output dir not found'
+  exit 3
+fi
+
+which -s ffmpeg
+if [ $? -ne 0 ]; then
+  echo 'Please install ffmpeg'
+  exit 2
+fi
+
+current_file=0
+total_files=$#
+talk "Starting resample of $total_files files ($width $aspect)"
+
+for filepath in "$@"; do
+	current_file=$(( $current_file + 1 ))
+
+	filename=$(basename "$filepath")
+	ext=${filename##*.}
+	name=${filename%.*}
+
+	talk "($current_file/$total_files) Processing: $filename"
+
+	# ffmpeg -n -loglevel error -i "$filepath" -vf scale=$width:$height -vcodec libx264 $output_dir/$name.mp4
+	ffmpeg -n -loglevel error -i "$filepath" -vf "crop=ih/$aspect_h*$aspect_w:ih,scale=$width:$width/$aspect_w*$aspect_h" -vcodec libx264 -crf 23 -preset veryfast -tune fastdecode $output_dir/$name.mp4
+	sleep 0.5
+done
+
+talk "Done resampling $total_files files."
