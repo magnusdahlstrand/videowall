@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd $(dirname $0)
+
+if [[ "$(uname -m)" == "armv7l" ]]; then
+	>&2 echo "wrong arch: armv7l expected, $(uname -m) seen"
+	exit 1
+fi
+if [[ "$1" != "-f" ]]; then
+	read -p "Setup CHIP? [y/n] " -n 1 -r choice
+	if [[ "$choice" != "y" ]]; then
+		exit 0
+	fi
+	echo
+fi
+
+ln -sf .bashrc ~/
+. ~/.bashrc
+nmtui
+sudo apt update
+sudo apt upgrade
+sudo apt install git
+
+echo "complete"
