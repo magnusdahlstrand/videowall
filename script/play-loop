@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+media=$1
+shift
+
+command -v omxplayer >/dev/null 2>&1
+has_player=$?
+
+if [ $has_player -ne 0 ]; then
+	echo 'omxplayer not found in PATH'
+fi
+
+ps aux | grep --quiet "[o]mxplayer"
+playing=$?
+if [ $playing -ne 0 ]; then
+	omxplayer --nativedeinterlace --no-osd --no-keys --loop $media
+fi
+

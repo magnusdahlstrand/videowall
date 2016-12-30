@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+media_dir=/home/pi/media
+cd $media_dir
+while true; do
+	ls $media_dir/ | sort -R | head -n 1 | xargs omxplayer
+	sleep 0.5
+done
