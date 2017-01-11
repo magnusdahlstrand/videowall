@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+DISPLAY=:0 mplayer --vo=sdl --zoom --nosound --ontop --no-ass "$@"
