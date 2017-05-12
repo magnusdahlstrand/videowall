@@ -1,0 +1,19 @@
+# Projector
+# anime
+# misc
+# sleaze
+# space
+# travel
+
+2017-05-12 20:00:00 shuffle-play /home/debian/media/space
+2017-05-12 22:00:00 shuffle-play /home/debian/media/anime
+2017-05-12 23:00:00 shuffle-play /home/debian/media/misc
+2017-05-13 00:01:00 shuffle-play /home/debian/media/space
+2017-05-13 01:00:00 shuffle-play /home/debian/media/travel
+2017-05-13 02:00:00 shuffle-play /home/debian/media/sleaze
+2017-05-13 03:00:00 shuffle-play /home/debian/media/misc
+2017-05-13 04:00:00 shuffle-play /home/debian/media/travel
+2017-05-13 05:00:00 shuffle-play /home/debian/media/anime
+2017-05-13 06:00:00 shuffle-play /home/debian/media/sleaze
+2017-05-13 07:00:00 shuffle-play /home/debian/media/space
+2017-05-13 08:00:00 shuffle-play /home/debian/media/misc

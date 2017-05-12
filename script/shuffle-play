@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set +m
+
+if [[ -z "$1" ]]; then
+	echo "no input"
+	exit 1
+fi
+if [[ ! -d "$1" ]]; then
+	echo "no dir"
+	exit 2
+fi
+
+pid=""
+
+playlist=$(mktemp /tmp/shuffle-play.XXXXXX)
+onquit() {
+	rm $playlist
+	kill $pid > /dev/null 2>&1
+}
+
+trap onquit EXIT
+
+ls "$1"/*.mp4 | sort --random-sort > $playlist
+
+which omxplayer &> /dev/null
+hasomxplayer=$?
+if [[ "$?" -eq 0 ]]; then
+	# omxplayer
+	# cmd="DISPLAY=:0 omxplayer --nativedeinterlace --no-osd --no-keys --aspect-mode fill --loop"
+	cmd="play-playlist"
+else
+	# mplayer
+	# cmd="DISPLAY=:0 mplayer --hardframedrop -nosound -really-quiet -framedrop -fs --ontop --no-ass -loop 0 -playlist"
+	cmd="play-playlist"
+fi
+
+
+$cmd $playlist &> /dev/null &
+pid=$!
+echo "internal pid $pid"
+wait $pid
+echo "shuffle-play done"

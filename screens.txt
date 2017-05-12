@@ -1,0 +1,19 @@
+# Screens
+# abstract
+# glitch
+# musictech
+# space
+# travel
+
+2017-05-12 20:00:00 shuffle-play /home/pi/media/abstract
+2017-05-12 22:00:00 shuffle-play /home/pi/media/musictech
+2017-05-12 23:00:00 shuffle-play /home/pi/media/glitch
+2017-05-13 00:01:00 shuffle-play /home/pi/media/space
+2017-05-13 01:00:00 shuffle-play /home/pi/media/travel
+2017-05-13 02:00:00 shuffle-play /home/pi/media/sleaze
+2017-05-13 03:00:00 shuffle-play /home/pi/media/glitch
+2017-05-13 04:00:00 shuffle-play /home/pi/media/travel
+2017-05-13 05:00:00 shuffle-play /home/pi/media/musictech
+2017-05-13 06:00:00 shuffle-play /home/pi/media/abstract
+2017-05-13 07:00:00 shuffle-play /home/pi/media/space
+2017-05-13 08:00:00 shuffle-play /home/pi/media/abstract

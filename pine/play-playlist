@@ -1,0 +1,1 @@
+DISPLAY=:0 mplayer --hardframedrop -nosound -really-quiet -framedrop -fs --ontop --no-ass -loop 0 -playlist

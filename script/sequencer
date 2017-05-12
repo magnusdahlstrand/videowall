@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+set -e
+set +m
+
+if [[ -z "$@" ]]; then
+	echo "usage: sequencer schedule.txt"
+	echo
+	echo "format: (one per line)"
+	echo "YYYY-MM-DD HH:MM:SS command"
+	exit 1
+fi
+schedule=$1
+if [[ ! -r "$schedule" ]]; then
+	echo "input schedule not readable"
+	exit 2
+fi
+
+a_before_b() {
+	if [[ $1 -gt $2 ]]; then
+		return 1
+	fi
+	return 0
+}
+
+get_unixtime() {
+	date -d "$@" +%s
+}
+
+extract_datetime() {
+	sed -E -n 's/([0-9\-]* [0-9\:]*).*/\1/p' <<< "$@"
+}
+extract_command() {
+	sed -E -n 's/[0-9\-]* [0-9\:]* (.*)/\1/p' <<< "$@"
+}
+
+pid=""
+
+while true; do
+	# now=$(date +"%Y-%m-%d %H:%M")
+	now=$(date +%s)
+	while read -r line; do
+		# skip empty lines
+		if [[ -z "$line" ]]; then
+			continue
+		fi
+		# skip commented lines
+		if [[ ${line:0:1} == "#" ]]; then
+			continue
+		fi
+		date=$(get_unixtime "$(extract_datetime "$line")")
+		cmd=$(extract_command "$line")
+		if [[ $now -gt $date ]]; then
+			# Start the command
+			/usr/bin/env $cmd &
+			pid=$!
+			enddate=$(expr $now + 15)
+			echo "enddate in $enddate (now: $now)"
+			sleep 1
+			while true; do
+				echo "check"
+				set +e
+				kill -0 $pid > /dev/null 2>&1
+				state=$?
+				set -e
+				if [[ "$state" -ne 0 ]]; then
+					# not running
+					# break out of loop to play next
+					echo "not running"
+					break
+				else
+					# we are running, but have we been
+					# playing this for too long?
+					echo -n "have we run too long?"
+					if [[ $(date +%s) -gt $enddate ]]; then
+						echo "yes"
+						kill $pid
+						break
+					else
+						echo "no"
+					fi
+				fi
+				sleep 3
+			done
+			break
+		else
+			continue
+		fi
+	done <<< "$(cat $schedule | sort --reverse)"
+	echo "round done"
+	sleep 1
+done

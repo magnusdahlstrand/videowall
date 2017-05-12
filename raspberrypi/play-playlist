@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ -z "$1" ]]; then
+  echo "no input"
+  exit 1
+fi
+
+playlist="$1"
+
+while read -r file; do
+	echo $file
+	tvservice --sdtvon="PAL 4:3"
+	#display=:0 omxplayer --nativedeinterlace --no-osd --no-keys --aspect-mode fill $file
+	display=:0 omxplayer --no-osd --no-keys --aspect-mode fill $file
+done <<< "$(cat $playlist)"
