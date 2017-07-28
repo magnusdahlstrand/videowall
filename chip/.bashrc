@@ -17,4 +17,5 @@ setup() {
 	nmtui
 	sudo apt-get install git-core screen build-essential locales
 	sudo dpkg-reconfigure locales
+	sudo sed -i -e 's/ExecStart=-\/sbin\/agetty --noclear %I \$TERM/ExecStart=-\/sbin\/agetty --noclear -a chip %I \$TERM/g' /lib/systemd/system/getty@.service
 }
